@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="쉐도잉"><meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="icon.svg"><link rel="icon" href="icon.svg">
+<title>OPIc AL 쉐도잉 연습</title>
+<style>
+body{font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;margin:0;background:#f5f7fb;color:#222}
+main{max-width:760px;margin:auto;padding:14px}
+h1{font-size:1.3rem;margin:.3em 0}
+.card{background:#fff;border-radius:12px;padding:12px;margin:10px 0;box-shadow:0 1px 4px #0002}
+textarea{width:100%;box-sizing:border-box;height:160px;font-size:15px;padding:8px;border-radius:8px;border:1px solid #ccc}
+button,select{font-size:17px;min-height:48px;padding:10px 14px;touch-action:manipulation;margin:3px 2px;border-radius:8px;border:1px solid #bbb;background:#fff}
+button.p{background:#2563eb;color:#fff;border-color:#2563eb}
+button.on{background:#111;color:#fff}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:6px 0}
+label{font-size:14px}
+input[type=number]{width:50px;font-size:15px}
+#sents p{margin:4px 0;padding:6px 8px;border-radius:8px;line-height:1.6;cursor:pointer}
+#sents p.cur{background:#fff3c4;outline:2px solid #f5b800}
+#big{font-size:1.25rem;line-height:1.7;min-height:3em}
+b.s{color:#d6336c}
+.small{font-size:13px;color:#666}
+#status{font-weight:600;color:#2563eb}
+#ctl button{flex:1 1 22%}textarea{font-size:16px}input[type=number]{font-size:16px;min-height:40px}input[type=range]{width:180px;height:32px}
+@media(max-width:600px){#ctl{position:sticky;bottom:0;background:#fff;padding:6px 0;z-index:5}}
+</style></head><body><main>
+<h1>🎧 OPIc AL 쉐도잉 연습</h1>
+<div class="card">
+<div class="row"><label style="flex:1">📚 스크립트 라이브러리 (유형별 만능 템플릿)<br><select id="lib" style="width:100%"></select></label></div>
+<div id="tip" class="small" style="background:#eef4ff;padding:6px;border-radius:6px"></div>
+<div class="small">영어 스크립트를 붙여넣으세요. 강세 단어는 <b>*별표*</b> 또는 <b>대문자</b>로 표시 → 굵게 표시되고 더 높고 크게, 약간 천천히 읽어요. 쉼표에서 짧게 끊어 읽어요(청킹).</div>
+<textarea id="src"></textarea>
+<div class="row"><button class="p" id="apply">문장 나누기 적용</button></div>
+</div>
+<div class="card">
+<div class="row"><label>목소리 <select id="voice"></select></label></div>
+<div class="row"><label>속도 <input type="range" id="rate" min="0.6" max="1.2" step="0.05" value="0.9"> <span id="rateV">0.9</span>x</label></div>
+<div class="row"><label><input type="checkbox" id="emph" checked> 강세 강조 읽기</label></div>
+<div class="row"><button id="mS" class="on">문장 단위</button><button id="mF">전체 읽기</button></div>
+<div id="sentCtl">
+<div class="row"><label>반복 <input type="number" id="rep" min="1" max="10" value="2">회</label>
+<label>따라하기 쉬는 시간 <select id="gap"><option value="0">없음</option><option value="1">문장 길이 ×1</option><option value="1.5" selected>×1.5</option><option value="2">×2</option></select></label>
+<label><input type="checkbox" id="autoNext"> 자동 다음 문장</label></div>
+</div>
+<div class="row" id="ctl"><button id="prev">◀ 이전</button><button class="p" id="play">▶ 재생</button><button id="stop">■ 정지</button><button id="next">다음 ▶</button></div>
+<div id="status"></div>
+<div id="big"></div>
+</div>
+<div class="card">
+<div class="row"><button id="rec">🎙 녹음 시작</button><button id="both" disabled>원어 + 내 녹음 연달아 듣기</button></div>
+<audio id="aud" controls style="width:100%;display:none"></audio>
+<div class="small">녹음은 현재 문장(또는 원하는 구간)을 따라 말한 뒤 비교해 보세요. 데이터는 기기 밖으로 나가지 않아요.</div>
+</div>
+<div class="card"><div class="small">문장 목록 (탭하면 해당 문장으로 이동)</div><div id="sents"></div></div>
+</main>
+<script>
+const SAMPLE=`Hi, my name is Kyung-ho, and I *live* in a *cozy* little apartment in *Seoul*, right near the *Han River*. Honestly, I *absolutely* LOVE my neighborhood. It's *super* convenient, because there's a *subway station* just a *five-minute* walk from my place. On top of that, there are *tons* of *cafes*, *restaurants*, and *small shops* all around, so I *never* get bored. My apartment itself is *pretty* *compact*, but it's *bright* and *cheerful*, and I've *decorated* it with *plants* and *warm* lighting. What I *like* the MOST, though, is the *river park*. Whenever I feel *stressed out*, I just *grab* my *headphones* and go for a *long walk* along the *riverside*. Watching the *sunset* over the *water* really *clears* my head. Of course, it's *not* perfect. The *rent* is *kind of* *expensive*, and it can get *really* *crowded* on weekends. But all in all, I *wouldn't* trade it for *anything*. It *truly* feels like *home* to me.`;
+const LIB=[
+{g:'자기소개',n:'자기소개 (사는 곳 포함)',tip:'이름→사는 곳→성격/관심사 순서. 감정 형용사에 강세.',t:SAMPLE},
+{g:'오프닝/클로징',n:'오프닝 만능 문장',tip:'질문을 받으면 바로 이 문장으로 시간 벌기 + 자연스러운 시작.',t:`Oh, *that's* a *great* question. *Let me* think about it for a *second*. Well, to be *honest* with you, I've *never* really thought about it *that* deeply before, but I'd *say*, it's *definitely* something I can *relate* to. So, let me *walk* you through it, *step* by *step*.`},
+{g:'오프닝/클로징',n:'클로징 만능 문장',tip:'답변 끝을 깔끔하게 정리. 마무리 억양을 내려주세요.',t:`So, *yeah*, that's *pretty much* it. *All in all*, it was a *really* *meaningful* experience for me, and I *still* think about it from *time* to *time*. I *hope* that answers your question. *Thanks* for listening!`},
+{g:'묘사',n:'장소/집/동네 묘사 만능',tip:'전체 인상→세부(위치·분위기)→내가 좋아하는 점→단점 살짝→결론.',t:`Let me *describe* my *favorite* place for you. It's *located* in the *heart* of the city, so it's *super* easy to get to. The *first* thing you'll notice is the *atmosphere*. It's *calm*, *cozy*, and *really* *laid-back*. There are *big* windows, so *tons* of *natural* light comes in. What I *like* the MOST is that I can *totally* *relax* there and *forget* about my *stress*. Of course, it gets a *bit* *crowded* on weekends, but *honestly*, that's *not* a big deal. It's *definitely* one of my *go-to* spots.`},
+{g:'루틴/습관',n:'루틴/습관 만능',tip:'보통 언제→어떻게(순서)→왜 하는지→느낌. 빈도부사에 강세.',t:`I *usually* do this about *three* times a *week*, *mostly* in the *evening* after work. *First*, I *grab* a *quick* snack, so I don't get *hungry*. *Then*, I *change* into *comfortable* clothes and *get* started. *After* that, I *spend* about an *hour* on it, and *finally*, I *wrap* things up with a *hot* shower. It's *become* a *huge* part of my *daily* life. It *really* helps me *recharge*, and I feel *way* more *productive* the next day.`},
+{g:'과거 경험',n:'처음 경험 (first time)',tip:'언제/어디서→기대·긴장→실제 일어난 일→느낀 점.',t:`I *still* remember the *very* *first* time I tried it. It was *about* *five* years ago, when I was in *college*. To be *honest*, I was *pretty* *nervous* at first, because I had *no* idea what to *expect*. But *surprisingly*, it turned out to be *way* more *fun* than I *thought*. My *friend* showed me the *basics*, and *before* I knew it, I was *totally* *hooked*. *Looking back*, it was a *turning* point for me.`},
+{g:'과거 경험',n:'가장 기억에 남는 경험 (memorable)',tip:'배경→문제/사건→해결→교훈. 감정 단어를 크게.',t:`The *most* *memorable* experience I've ever had was *last* *summer*. My friends and I went on a *road* trip, and *everything* was going *great*, until our car *suddenly* *broke* *down* in the *middle* of *nowhere*. We were *completely* *stuck*, and *nobody* knew what to do. *Luckily*, a *kind* *local* stopped and *helped* us *call* a *tow* truck. It was *stressful* at the time, but now we *laugh* about it *all* the time. It taught me to *stay* *calm* *no matter* what.`},
+{g:'과거 경험',n:'최근 경험 (recent)',tip:'"Just last weekend" 처럼 구체적인 시점으로 시작.',t:`*Just* *last* *weekend*, I actually did this with my *family*. We *hadn't* done it in *ages*, so *everyone* was *super* *excited*. We *spent* the *whole* afternoon together, *chatting*, *eating*, and *catching up*. The *best* part was when my *dad* told us a *hilarious* story from his *childhood*. It *reminded* me how *important* it is to *make* time for the people I *love*.`},
+{g:'비교/변화',n:'과거 vs 현재 비교 만능',tip:'In the past ↔ These days 대비 구조. 대조 단어에 강세.',t:`*Compared* to the *past*, things have *changed* a *lot*. *Back* in the *day*, people *mostly* did this *offline*, and it took *forever*. But *these* days, *thanks* to *technology*, everything is *much* *faster* and more *convenient*. *On the other hand*, I feel like we've *lost* some of the *personal* *touch*. *Personally*, I think the *changes* are *mostly* *positive*, but we *shouldn't* forget the *good* *old* ways *either*.`},
+{g:'롤플레이',n:'질문하기 (면접관에게 3~4개 질문)',tip:'인사→상황 설명→질문 3~4개→감사. 의문사에 강세.',t:`Hi, *there*! I *heard* that you *recently* started this, and I'm *really* *curious* about it. Could I *ask* you a *few* questions? *First* of all, *when* did you *get* into it? And *what* made you *interested* in it in the *first* place? *Also*, *how* *often* do you do it? *Lastly*, do you have *any* *tips* for a *beginner* like me? *Thanks* so much, I *really* appreciate it!`},
+{g:'롤플레이',n:'문제 해결 + 대안 제시',tip:'사과/상황 설명→문제→대안 2~3개→부탁/감사.',t:`Hi, this is *Kyung-ho*. I'm *so* *sorry* to *bother* you, but I've got a *bit* of a *problem*. *Unfortunately*, something *came up* at *work*, so I *can't* make it *tomorrow*. I *totally* understand if you're *disappointed*. So, I've *thought* of a *couple* of *alternatives*. *First*, we could *reschedule* for *next* *weekend*. *Or*, if you *prefer*, I could *ask* a *friend* to go *instead*. *Just* let me know what *works* *best* for you. *Again*, I'm *really* sorry about this.`},
+{g:'돌발',n:'사회 이슈/뉴스 만능',tip:'이슈 소개→원인→영향→내 의견. 모르는 주제도 이 틀로.',t:`*Recently*, one of the *biggest* *issues* in *Korea* has been the *rising* *cost* of *living*. It's been *all* over the *news* *lately*. *Basically*, *prices* for *food*, *rent*, and *transportation* have gone *way* up. As a *result*, a *lot* of *young* people are *struggling* to *save* money. *Personally*, I think the *government* should *step* *in* and *do* *more* to *help*. It's a *really* *serious* *problem* that *affects* *everyone*.`},
+{g:'돌발',n:'기술(Technology) 만능',tip:'사용 기술 → 장점 → 단점/우려 → 균형 잡힌 결론.',t:`These days, I *can't* *imagine* my life *without* my *smartphone*. I use it for *literally* *everything*, from *banking* to *shopping* to *keeping* in touch with *friends*. The *biggest* *advantage* is *convenience*. *However*, there are *downsides*, *too*. For *example*, people *spend* *way* too much time *staring* at their *screens*, and *privacy* is a *huge* *concern*. So, I think *technology* is *great*, *as long as* we use it *wisely*.`},
+{g:'돌발',n:'산업/업계 만능',tip:'업계 소개→최근 트렌드→기업/소비자 변화→미래 전망.',t:`The *industry* I'm *most* *interested* in is the *IT* industry. Over the *past* *decade*, it has *grown* *incredibly* *fast*. One of the *hottest* *trends* right now is *artificial* *intelligence*. *Many* companies are *investing* *heavily* in it, and *consumers* are *already* *using* *AI* services *every* day. In the *future*, I *believe* it will *completely* *change* the *way* we *work* and *live*.`},
+{g:'필러/연결어',n:'필러 & 연결 표현 모음',tip:'답변 중간에 자연스럽게 섞어 쓰세요. 한 문장씩 반복 연습!',t:`*Well*, let me *see*. You *know* what I mean? *Actually*, *come to think of it*, that's *not* *entirely* true. *Anyway*, *getting* *back* to my *point*. *On top of that*, it was *super* *cheap*. *Long* story *short*, we *made* it in *time*. The *thing* is, I'm *not* a *morning* person. *To be honest*, I was *kind of* *shocked*. *What I mean is*, it was *totally* *worth* it. *At the end of the day*, *that's* what *matters* the *most*.`}
+];
+
+const $=id=>document.getElementById(id);
+const synth=window.speechSynthesis;
+let sents=[],idx=0,mode='S',token=0,voices=[];
+function split(t){t=t.replace(/\s+/g,' ').trim();if(!t)return[];
+ return (t.match(/[^.!?]+(?:[.!?]+["')\]]*|$)/g)||[]).map(s=>s.trim()).filter(Boolean);}
+function isCaps(w){const c=w.replace(/[^A-Za-z]/g,'');return c.length>=2&&c===c.toUpperCase()&&!/^(I|OK|TV|US|UK|AM|PM|OPIC)$/i.test(c)&&c!=='I';}
+function tokens(s){// -> [{t,stress,pauseAfter}]
+ const out=[];s.replace(/\*([^*]+)\*|(\S+)/g,(m,a,b)=>{let w=a!==undefined?a:b,st=a!==undefined||isCaps(b);
+  const trail=a!==undefined?'':'';out.push({t:w,s:st});return m});
+ return out;}
+function esc(x){return x.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+function html(s){return tokens(s).map(o=>o.s?'<b class="s">'+esc(o.t)+'</b>':esc(o.t)).join(' ').replace(/<\/b> ([,.;:!?])/g,'</b>$1')}
+function chunks(s){// group into utterance chunks
+ const emph=$('emph').checked,res=[];let cur=null;
+ for(const o of tokens(s)){const w=o.t.replace(/\*/g,'');const st=emph&&o.s;
+  if(!cur||cur.s!==st){cur={s:st,t:[]};res.push(cur)}cur.t.push(w);
+  if(/[,;:—]$/.test(w)){cur.pause=true;cur=null}}
+ if(!emph)return res.map(c=>({...c,s:false}));return res;}
+function render(){const box=$('sents');box.innerHTML='';sents.forEach((s,i)=>{const p=document.createElement('p');p.innerHTML=(i+1)+'. '+html(s);p.onclick=()=>{stop();idx=i;show()};box.appendChild(p)});show();}
+function show(){[...$('sents').children].forEach((p,i)=>p.classList.toggle('cur',i===idx));
+ $('big').innerHTML=sents[idx]?html(sents[idx]):'';const c=$('sents').children[idx];if(c&&mode==='F')c.scrollIntoView({block:'nearest',behavior:'smooth'});}
+function loadVoices(){voices=synth?synth.getVoices().filter(v=>/^en/i.test(v.lang)):[];
+ const rank=v=>(/en[-_]US/i.test(v.lang)?0:/en[-_]GB/i.test(v.lang)?1:2)+(/google|natural|samantha|daniel|premium|enhanced/i.test(v.name)?-0.5:0);
+ voices.sort((a,b)=>rank(a)-rank(b));const sel=$('voice'),old=sel.value;sel.innerHTML='';
+ voices.forEach((v,i)=>{const o=document.createElement('option');o.value=i;o.textContent=v.name+' ('+v.lang+')';sel.appendChild(o)});
+ if(!voices.length)sel.innerHTML='<option>영어 음성 없음</option>';if(old&&old<voices.length)sel.value=old;}
+function sleep(ms,tk){return new Promise(r=>{const t0=Date.now();const iv=setInterval(()=>{if(tk!==token||Date.now()-t0>=ms){clearInterval(iv);r()}},50)})}
+function say(text,o,tk){return new Promise(r=>{if(tk!==token||!synth)return r();const u=new SpeechSynthesisUtterance(text);
+ const v=voices[$('voice').value];if(v){u.voice=v;u.lang=v.lang}else u.lang='en-US';
+ const base=+$('rate').value;u.rate=o.s?base*0.85:base;u.pitch=o.s?1.3:1;u.volume=o.s?1:0.85;
+ let done=false;const fin=()=>{if(!done){done=true;r()}};u.onend=fin;u.onerror=fin;synth.speak(u);
+ setTimeout(fin,1500+text.length*200/base);});}
+async function speakSent(s,tk){const t0=Date.now();
+ for(const c of chunks(s)){if(tk!==token)return 0;await say(c.t.join(' '),c,tk);if(c.pause)await sleep(220/(+$('rate').value),tk);}
+ return Date.now()-t0;}
+function st(m){$('status').textContent=m}
+async function playSentence(){const tk=++token;synth&&synth.cancel();
+ const n=Math.max(1,+$('rep').value||1),g=+$('gap').value;
+ while(tk===token){show();
+  for(let k=0;k<n&&tk===token;k++){st(`🔊 듣기 (${k+1}/${n}) — 문장 ${idx+1}/${sents.length}`);const d=await speakSent(sents[idx],tk);
+   if(g>0&&tk===token){st(`🗣 따라 말하세요! (${k+1}/${n})`);await sleep(d*g+300,tk)}else await sleep(300,tk);}
+  if(tk!==token)return;if($('autoNext').checked&&idx<sents.length-1){idx++;continue}break;}
+ if(tk===token)st('완료');}
+async function playFull(){const tk=++token;synth&&synth.cancel();
+ for(;idx<sents.length&&tk===token;idx++){show();st(`📖 전체 읽기 — ${idx+1}/${sents.length}`);await speakSent(sents[idx],tk);await sleep(250,tk);}
+ if(tk===token){idx=Math.max(0,sents.length-1);st('전체 읽기 완료');}}
+function stop(){token++;synth&&synth.cancel();st('정지됨')}
+$('play').onclick=()=>{if(synth&&!window._u){window._u=1;try{synth.cancel();const u=new SpeechSynthesisUtterance(' ');u.volume=0;synth.speak(u)}catch(e){}}if(synth&&!voices.length)loadVoices();if(!synth){alert('이 브라우저는 음성합성을 지원하지 않아요.');return}if(!sents.length)return;mode==='S'?playSentence():playFull()};
+$('stop').onclick=stop;
+$('prev').onclick=()=>{stop();idx=Math.max(0,idx-1);show();if(mode==='S')playSentence()};
+$('next').onclick=()=>{stop();idx=Math.min(sents.length-1,idx+1);show();if(mode==='S')playSentence()};
+$('mS').onclick=()=>{stop();mode='S';$('mS').classList.add('on');$('mF').classList.remove('on');$('sentCtl').style.display=''};
+$('mF').onclick=()=>{stop();mode='F';$('mF').classList.add('on');$('mS').classList.remove('on');$('sentCtl').style.display='none'};
+$('rate').oninput=()=>$('rateV').textContent=$('rate').value;
+$('apply').onclick=()=>{stop();sents=split($('src').value);idx=0;render();localStorage.setItem('shadow_src',$('src').value)};
+(()=>{const sel=$('lib');let og=null;sel.innerHTML='<option value="">✏️ 직접 붙여넣기 (내 스크립트)</option>';LIB.forEach((x,i)=>{if(!og||og.label!==x.g){og=document.createElement('optgroup');og.label=x.g;sel.appendChild(og)}const o=document.createElement('option');o.value=i;o.textContent=x.n;og.appendChild(o)});
+sel.onchange=()=>{const x=LIB[sel.value];if(!x){$('tip').textContent='아래에 원하는 스크립트를 붙여넣고 [문장 나누기 적용]을 누르세요.';$('src').value='';$('src').focus();return}$('tip').textContent='💡 '+x.tip;$('src').value=x.t;$('apply').onclick()};})();
+// recording
+let rec=null,chunksA=[],recURL=null;
+$('rec').onclick=async()=>{if(rec&&rec.state==='recording'){rec.stop();return}
+ if(!navigator.mediaDevices||!window.MediaRecorder){alert('이 브라우저는 녹음을 지원하지 않아요.');return}
+ try{const ms=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(ms);chunksA=[];
+  rec.ondataavailable=e=>chunksA.push(e.data);
+  rec.onstop=()=>{ms.getTracks().forEach(t=>t.stop());if(recURL)URL.revokeObjectURL(recURL);recURL=URL.createObjectURL(new Blob(chunksA,{type:rec.mimeType}));
+   const a=$('aud');a.src=recURL;a.style.display='block';$('both').disabled=false;$('rec').textContent='🎙 다시 녹음';};
+  rec.start();$('rec').textContent='⏹ 녹음 중지';}catch(e){alert('마이크 권한이 필요해요: '+e.message)}};
+$('both').onclick=async()=>{stop();const tk=++token;st('🔊 원어 듣기');await speakSent(sents[idx]||'',tk);if(tk!==token)return;
+ st('🎧 내 녹음');const a=$('aud');a.currentTime=0;a.play();};
+// init
+if(synth){loadVoices();synth.onvoiceschanged=loadVoices;}
+{const sv=localStorage.getItem('shadow_src');if(sv&&sv!==SAMPLE){$('lib').value='';$('src').value=sv;$('tip').textContent='저장된 내 스크립트를 불러왔어요.'}else{$('lib').value='0';$('tip').textContent='💡 '+LIB[0].tip;$('src').value=SAMPLE;}}sents=split($('src').value);render();
+</script></body></html>
